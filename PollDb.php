@@ -75,7 +75,8 @@ class PollDb
             }
         }
 
-        return (new Query())->createCommand()->delete('poll_response', 'poll_id = "' . $pollObj['id'] . '" AND answers NOT IN (\'' . implode(unserialize($pollObj['answer_options']), "', '") . '\')')->execute();
+        return (new Query())->createCommand()->delete('poll_response',
+            'poll_id = "' . $pollObj['id'] . '" AND answers NOT IN (\'' . implode(unserialize($pollObj['answer_options']), "', '") . '\')')->execute();
     }
 
 
@@ -130,7 +131,7 @@ class PollDb
      * @version  2.0.7
      * @since    na
      *
-     * @param  int     $id Poll id
+     * @param  int     $id            Poll id
      * @param  integer $voice         Integer of chosen key
      * @param  array   $answerOptions Array fo possible options
      *
@@ -156,7 +157,7 @@ class PollDb
      */
     public function updateUsers($pollId)
     {
-        $db      = Yii::$app->db;
+        $db = Yii::$app->db;
 
         return $db->createCommand()->insert('poll_user', [
             'poll_id' => $pollId,
@@ -173,7 +174,7 @@ class PollDb
     public function isVote($pollId)
     {
         $db      = Yii::$app->db;
-        $ip = $_SERVER['REMOTE_ADDR'];
+        $ip      = $_SERVER['REMOTE_ADDR'];
         $command = $db->createCommand("SELECT * FROM  poll_user  WHERE user_ip='$ip' AND poll_id=:pollId")->bindParam(':pollId', $pollId);
         $result  = $command->queryOne();
 
@@ -193,30 +194,32 @@ class PollDb
         $db = Yii::$app->db;
         $db->createCommand("
             CREATE TABLE IF NOT EXISTS `poll_user` (
-            `id`            int(11) NOT NULL AUTO_INCREMENT,
-            `poll_id`       int(11) NOT NULL,
-            `user_id`       int(11) NOT NULL,
+            `id` int(11) NOT NULL,
+            `poll_id` int(11) NOT NULL,
+            `user_ip` varchar(255) NOT NULL,
             PRIMARY KEY (`id`),
             KEY `poll_id` (`poll_id`)
             ) ENGINE=InnoDB  DEFAULT CHARSET=utf8")->execute();
 
         $db->createCommand("
             CREATE TABLE IF NOT EXISTS `poll_question` (
-            `id`            int(11) NOT NULL AUTO_INCREMENT,
-            `poll_name`     varchar(128) NOT NULL,
-            `answer_options`text NOT NULL,
+            `id` int(11) NOT NULL,
+            `user_id` bigint(20) UNSIGNED NOT NULL,
+            `poll_name` varchar(255) NOT NULL,
+            `answer_options` text NOT NULL,
+            `is_default` smallint(5) UNSIGNED NOT NULL,
             PRIMARY KEY (`id`),
-            KEY `poll_name` (`poll_name`(128))
+            KEY `poll_name` (`poll_name`(255))
             ) ENGINE=InnoDB  DEFAULT CHARSET=utf8")->execute();
 
         $db->createCommand("
             CREATE TABLE IF NOT EXISTS `poll_response` (
-            `id`            int(11) NOT NULL AUTO_INCREMENT,
-            `poll_name`     varchar(128) NOT NULL,
-            `answers`       varchar(128) CHARACTER SET utf8mb4 NOT NULL,
-            `value`         int(11) NOT NULL,
+            `id` int(11) NOT NULL,
+            `poll_id` int(11) UNSIGNED NOT NULL,
+            `answers` varchar(128) CHARACTER SET utf8mb4 NOT NULL,
+            `value` int(11) NOT NULL,
             PRIMARY KEY (`id`),
-            KEY `poll_name` (`poll_name`(128))
+            KEY `poll_id` (`poll_id`)
             ) ENGINE=InnoDB  DEFAULT CHARSET=utf8")->execute();
     }
 
@@ -259,7 +262,7 @@ class PollDb
      */
     public function savePoll($data)
     {
-       
+
         try {
             $db = Yii::$app->db;
 
@@ -279,6 +282,7 @@ class PollDb
             die( json_encode($ex->getMessage()) );
         }
     }
+
 
     public function deletePoll($id)
     {

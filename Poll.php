@@ -127,11 +127,10 @@ class Poll extends Widget
         parent::init();
 
         $pollDB = new PollDb;
-        
-        if(!$pollDB->isTableExists()) {
+
+        if(empty($pollDB->isTableExists())) {
             $pollDB->createTables();
         }
-        
 
         $this->getDbData();
 
