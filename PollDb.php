@@ -194,7 +194,7 @@ class PollDb
         $db = Yii::$app->db;
         $db->createCommand("
             CREATE TABLE IF NOT EXISTS `poll_user` (
-            `id` int(11) NOT NULL,
+            `id` int(11) NOT NULL AUTO_INCREMENT,
             `poll_id` int(11) NOT NULL,
             `user_ip` varchar(255) NOT NULL,
             PRIMARY KEY (`id`),
@@ -203,7 +203,7 @@ class PollDb
 
         $db->createCommand("
             CREATE TABLE IF NOT EXISTS `poll_question` (
-            `id` int(11) NOT NULL,
+            `id` int(11) NOT NULL AUTO_INCREMENT,
             `user_id` bigint(20) UNSIGNED NOT NULL,
             `poll_name` varchar(255) NOT NULL,
             `answer_options` text NOT NULL,
@@ -214,7 +214,7 @@ class PollDb
 
         $db->createCommand("
             CREATE TABLE IF NOT EXISTS `poll_response` (
-            `id` int(11) NOT NULL,
+            `id` int(11) NOT NULL AUTO_INCREMENT,
             `poll_id` int(11) UNSIGNED NOT NULL,
             `answers` varchar(128) CHARACTER SET utf8mb4 NOT NULL,
             `value` int(11) NOT NULL,
